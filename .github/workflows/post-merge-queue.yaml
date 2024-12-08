@@ -14,19 +14,17 @@ jobs:
     steps:
       # Step 1: Define a Base64-encoded JSON string
       - name: Define Base64 string
-        run: echo "${{github.event.head_commit.message}}" > base64_string.txt
+        run: echo "eyJrZXkxIjoiVmFsdWUxIiwia2V5MiI6IlZhbHVlMiJ9" > base64_string.txt
         # Decoded JSON: {"key1":"Value1","key2":"Value2"}
 
       # Step 2: Decode the Base64 string to JSON
       - name: Decode Base64 to JSON
         id: decode_json
         run: |
-          # Decode the Base64 string
+          # Decode the Base64 string and write the JSON to a file
           decoded_json=$(cat base64_string.txt | base64 --decode)
-          echo "Decoded JSON: $decoded_json"
-
-          # Export JSON to a temporary file
           echo "$decoded_json" > decoded.json
+          echo "Decoded JSON: $decoded_json"
 
       # Step 3: Parse JSON and set environment variables
       - name: Set environment variables from JSON
@@ -40,7 +38,8 @@ jobs:
       # Step 4: Use the environment variables
       - name: Print environment variables
         run: |
-          echo "key1: ${{ env.skip_ci }}"
+          echo "key1: ${{ env.key1 }}"
+          echo "key2: ${{ env.key2 }}"
 
   test:
     # Define the operating system to run the job
