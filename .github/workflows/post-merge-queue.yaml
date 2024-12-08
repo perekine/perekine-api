@@ -14,7 +14,7 @@ jobs:
     steps:
       # Step 1: Define a Base64-encoded JSON string
       - name: Define Base64 string
-        run: echo ${{github.event.head_commit.message}} > base64_string.txt
+        run: echo "${{github.event.head_commit.message}}" > base64_string.txt
         # Decoded JSON: {"key1":"Value1","key2":"Value2"}
 
       # Step 2: Decode the Base64 string to JSON
