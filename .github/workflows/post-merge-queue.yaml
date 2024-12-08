@@ -1,0 +1,20 @@
+name: Post merge queue CI
+
+# Trigger the workflow on push or pull request events
+on:
+  push:
+    branches:
+        - main
+
+# Define the jobs
+jobs:
+  test:
+    # Define the operating system to run the job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print GitHub Context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+    
