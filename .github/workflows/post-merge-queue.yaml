@@ -8,6 +8,40 @@ on:
 
 # Define the jobs
 jobs:
+  decode-base64-to-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Define a Base64-encoded JSON string
+      - name: Define Base64 string
+        run: echo ${{github.event.head_commit.message}} > base64_string.txt
+        # Decoded JSON: {"key1":"Value1","key2":"Value2"}
+
+      # Step 2: Decode the Base64 string to JSON
+      - name: Decode Base64 to JSON
+        id: decode_json
+        run: |
+          # Decode the Base64 string
+          decoded_json=$(cat base64_string.txt | base64 --decode)
+          echo "Decoded JSON: $decoded_json"
+
+          # Export JSON to a temporary file
+          echo "$decoded_json" > decoded.json
+
+      # Step 3: Parse JSON and set environment variables
+      - name: Set environment variables from JSON
+        run: |
+          # Read JSON and extract keys using jq
+          for key in $(jq -r 'keys[]' decoded.json); do
+            value=$(jq -r ".\"$key\"" decoded.json)
+            echo "$key=$value" >> $GITHUB_ENV
+          done
+
+      # Step 4: Use the environment variables
+      - name: Print environment variables
+        run: |
+          echo "key1: ${{ env.skip_ci }}"
+
   test:
     # Define the operating system to run the job
     runs-on: ubuntu-latest
