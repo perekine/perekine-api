@@ -8,38 +8,38 @@ on:
 
 # Define the jobs
 jobs:
-  decode-base64-to-json:
+  decode-base64:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Define a Base64-encoded JSON string
-      - name: Define Base64 string
-        run: echo "eyJrZXkxIjoiVmFsdWUxIiwia2V5MiI6IlZhbHVlMiJ9" > base64_string.txt
-        # Decoded JSON: {"key1":"Value1","key2":"Value2"}
-
-      # Step 2: Decode the Base64 string to JSON
-      - name: Decode Base64 to JSON
-        id: decode_json
+      # Step 1: Extract the commit message
+      - name: Get commit message
+        id: get_commit_message
         run: |
-          # Decode the Base64 string and write the JSON to a file
-          decoded_json=$(cat base64_string.txt | base64 --decode)
-          echo "$decoded_json" > decoded.json
-          echo "Decoded JSON: $decoded_json"
+          commit_message="${{ github.event.head_commit.message }}"
+          echo "Commit message: $commit_message"
+          echo "BASE64_STRING=$commit_message" >> $GITHUB_ENV
 
-      # Step 3: Parse JSON and set environment variables
+      # Step 2: Decode the Base64 string and save as JSON
+      - name: Decode Base64 string
+        run: |
+          decoded_json=$(echo "$BASE64_STRING" | base64 --decode)
+          echo "Decoded JSON: $decoded_json"
+          echo "$decoded_json" > decoded.json
+
+      # Step 3: Parse JSON and set as environment variables
       - name: Set environment variables from JSON
         run: |
-          # Read JSON and extract keys using jq
           for key in $(jq -r 'keys[]' decoded.json); do
             value=$(jq -r ".\"$key\"" decoded.json)
             echo "$key=$value" >> $GITHUB_ENV
           done
 
-      # Step 4: Use the environment variables
+      # Step 4: Use environment variables in subsequent steps
       - name: Print environment variables
         run: |
-          echo "key1: ${{ env.key1 }}"
-          echo "key2: ${{ env.key2 }}"
+          echo "Decoded key1: ${{ env.skip_ci }}"
+          echo "Decoded key2: ${{ env.key2 }}"
 
   test:
     # Define the operating system to run the job
