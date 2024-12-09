@@ -11,6 +11,10 @@ jobs:
   decode-base64:
     runs-on: ubuntu-latest
 
+    outputs:
+      skip_ci: ${{ steps.output.outputs.skip_ci }}
+      origin: ${{ steps.output.outputs.origin }}
+
     steps:
       # Step 1: Extract the commit message
       - name: Get commit message
@@ -37,22 +41,31 @@ jobs:
 
       # Step 4: Use environment variables in subsequent steps
       - name: Print environment variables
+        id: output
         run: |
           echo "Decoded key1: ${{env.origin}}"
           echo "Decoded key2: ${{env.skip_ci}}"
+          echo "::set-output name=origin::${{env.origin}}"
+          echo "::set-output name=skip_ci::${{env.skip_ci}}"
 
-  test:
-    # Define the operating system to run the job
+         
+  condtional-job-1:
+    needs: decode-base64
     runs-on: ubuntu-latest
+    if: needs.decode-base64.outputs.skip_ci != 'true'
 
     steps:
-      - name: Print GitHub Context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+      - name: Run conditional job step
+        run: echo "Running because skip is not true."
 
-      - name: Print commit message Base64
-        run: echo ${{github.event.head_commit.message}}
+  condtional-job-2:
+    needs: decode-base64
+    runs-on: ubuntu-latest
+    if: needs.decode-base64.outputs.skip_ci == 'true' && needs.decode-base64.outputs.origin == 'renaming_webhook'
+
+    steps:
+      - name: Run conditional job step
+        run: echo "Running because skip is true and origin is true"
             
     
     
