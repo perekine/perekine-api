@@ -38,8 +38,8 @@ jobs:
       # Step 4: Use environment variables in subsequent steps
       - name: Print environment variables
         run: |
-          echo "Decoded key1: ${{env.key1}}"
-          echo "Decoded key2: ${{env.key2}}"
+          echo "Decoded key1: ${{env.origin}}"
+          echo "Decoded key2: ${{env.skip_ci}}"
 
   test:
     # Define the operating system to run the job
