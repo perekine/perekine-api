@@ -40,11 +40,11 @@ jobs:
           done
 
       # Step 4: Use environment variables in subsequent steps
-      - name: Print environment variables
+      - name: Output info
         id: output
         run: |
-          echo "Decoded key1: ${{env.origin}}"
-          echo "Decoded key2: ${{env.skip_ci}}"
+          echo "origin: ${{env.origin}}"
+          echo "skip_ci: ${{env.skip_ci}}"
           echo "::set-output name=origin::${{env.origin}}"
           echo "::set-output name=skip_ci::${{env.skip_ci}}"
 
